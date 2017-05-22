@@ -1,0 +1,60 @@
+                                                                     
+                                                                     
+                                                                     
+Get data from CRM
+-	New added files structures
+
+├───api
+│       magentoPush.php
+│
+└───custom
+    └───modules
+        ├───AOS_Products_Quotes
+        │       logic_hooks.php
+        │
+        ├───cases
+        │       logic_hooks.php
+        │
+        ├───Contacts
+        │       logic_hooks.php
+        │
+        └───ksk05_Header3
+                logic_hooks.php
+
+
+
+1-	Create hooks to get specific events from CRM :
+    a.	AOS_Products_Quotes/logic_hooks.php
+        	$hook_array['before_save'][] = Array(1, 'line item update', 'api/magentoPush.php','magentoPush', 'lineItemUpdate')
+    b.	Cases/logic_hooks.php
+        	$hook_array['before_save'][] = Array(2, 'Case creation', 'api/magentoPush.php','magentoPush', 'caseCreation');
+    c.	Contacts/logic_hooks.php
+        	$hook_array['after_save'][] = Array(78, 'Update address', 'api/magentoPush.php','magentoPush', 'UpdateMagentoContact');
+    d.	ksk05_Header3/logic_hooks.php
+        	$hook_array['before_save'][] = Array(1, 'order update', 'api/magentoPush.php','magentoPush', 'orderUpdate');
+2-	Create class with function to get events data
+    -	api/magentoPush.php
+    A.	function UpdateAddress($bean, $event, $arguments):
+        o	gets
+            	contacts table :
+                •	id(addressid),account_id,first_name,last_name,email1,phone_mobile,primary_address_street,primary_address_street,primary_address_city,primary_address_state,primary_address_postalcode,primary_address_country
+    B.	function UpdateAddress($bean, $event, $arguments): for case creation & updating
+        o	gets
+            1)	cases Table :
+                •	id,name,description,case_number,status,resolution,account_id,state
+            2)	cases_cstm Table :
+                •	orderid_c (orderid),case_reasons , case_reasons description
+            3)	aos_products_quotes_cstm table
+                •	skuid_c
+    C.	function orderUpdate ($bean, $event, $arguments)
+        o	get
+            	ksk05_header3  table :
+                •	order_id, account_id, address_id,orderstatus
+            	ksk05_header3_cstm table :
+                •	orderconfirmed_c
+    D.	function lineItemUpdate ($bean):
+        o	get
+            	aos_products_quotes_audit (item) table:
+                •	item_id,orderid,name,quentity,CostPrice,ListPrice,product_unit_price,vat_amt,totalPrice
+
+
